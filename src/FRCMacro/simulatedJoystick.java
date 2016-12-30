@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import static FRCMacro.JoystickEvent.type.*;
+import static FRCMacro.JoystickEvent.eventType.*;
 
 /**
  * A class acting as an abstraction layer between a {@link Joystick} and a {@link Macro}.
@@ -16,8 +16,9 @@ class simulatedJoystick {
     private final boolean[] buttons;
     private final double[] axes;
     private int[] POVs;
-    private int id;
-    private ArrayList<JoystickEvent> events = new ArrayList<>();
+    private final int id;
+    private final ArrayList<JoystickEvent> events = new ArrayList<>();
+    public final byte simulatedJoystickFormatVersion = 1; //In case the format changes and you want to convert...
 
     /**
      * Creates a simulated joystick from the given joystick ID.
@@ -352,7 +353,7 @@ class simulatedJoystick {
             if (i != axes.length - 1)
                 str.append(',');
         }
-        return str.toString();
+        return str.append(simulatedJoystickFormatVersion).toString();
     }
 
     /**

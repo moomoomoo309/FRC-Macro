@@ -3,8 +3,11 @@ package FRCMacro;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import static FRCMacro.JoystickEvent.eventType.*;
+
 /**
  * An object representing a change in the state of a joystick, and when it occurred.
+ *
  * @author Nicholas DeLello
  * @see simulatedJoystick
  * @see Macro
@@ -12,13 +15,13 @@ import java.util.Locale;
 class JoystickEvent {
 
     /**
-     * The type of event, whether a button was pressed, a button was released, an axis was moved, or a pov switch moved.
+     * The eventType of event, whether a button was pressed, a button was released, an axis was moved, or a pov switch moved.
      */
-    public enum type {
+    public enum eventType {
         PRESS, RELEASE, AXIS, POV
     }
 
-    private final JoystickEvent.type eventType;
+    private final JoystickEvent.eventType eventType;
     private final int stickId;
     private final int id;
     private Double val;
@@ -26,13 +29,13 @@ class JoystickEvent {
     private static SimpleDateFormat fmt;
 
     /**
-     * Creates a joystick event. (JoystickEvent.type.PRESS/RELEASE/POV)
+     * Creates a joystick event. (JoystickEvent.eventType.PRESS/RELEASE/POV)
      *
-     * @param type  The type of event (JoystickEvent.type.PRESS/RELEASE/POV)
+     * @param type  The eventType of event (JoystickEvent.eventType.PRESS/RELEASE/POV)
      * @param id    The id of the joystick being used.
      * @param btnId The id of the button being pressed/released.
      */
-    public JoystickEvent(JoystickEvent.type type, int id, int btnId) {
+    public JoystickEvent(JoystickEvent.eventType type, int id, int btnId) {
         this.eventType = type;
         this.stickId = id;
         this.id = btnId;
@@ -40,14 +43,14 @@ class JoystickEvent {
     }
 
     /**
-     * Creates a joystick event. (JoystickEvent.type.AXIS/POV)
+     * Creates a joystick event. (JoystickEvent.eventType.AXIS/POV)
      *
-     * @param type   The type of event (JoystickEvent.type.AXIS)
+     * @param type   The eventType of event (JoystickEvent.eventType.AXIS)
      * @param id     The id of the joystick being used.
      * @param axisId The id of the axis being changed.
      * @param val    The current value of the axis.
      */
-    public JoystickEvent(JoystickEvent.type type, int id, int axisId, double val) {
+    public JoystickEvent(JoystickEvent.eventType type, int id, int axisId, double val) {
         this.eventType = type;
         this.stickId = id;
         this.id = axisId;
@@ -58,12 +61,12 @@ class JoystickEvent {
     /**
      * Creates a joystick event. (Press/Release)
      *
-     * @param type  The type of event (JoystickEvent.type.PRESS/RELEASE)
+     * @param type  The eventType of event (JoystickEvent.eventType.PRESS/RELEASE)
      * @param time  The time, in milliseconds, the event occurred. (from System.currentTimeMillis())
      * @param id    The id of the joystick being used.
      * @param btnId The id of the button being pressed/released.
      */
-    public JoystickEvent(JoystickEvent.type type, long time, int id, int btnId) {
+    public JoystickEvent(JoystickEvent.eventType type, long time, int id, int btnId) {
         this.eventType = type;
         this.stickId = id;
         this.id = btnId;
@@ -73,13 +76,13 @@ class JoystickEvent {
     /**
      * Creates a joystick event. (Axis)
      *
-     * @param type   The type of event (JoystickEvent.type.AXIS)
+     * @param type   The eventType of event (JoystickEvent.eventType.AXIS)
      * @param time   The time, in milliseconds, the event occurred. (from System.currentTimeMillis())
      * @param id     The id of the joystick being used.
      * @param axisId The id of the axis being changed.
      * @param val    The current value of the axis.
      */
-    public JoystickEvent(JoystickEvent.type type, long time, int id, int axisId, double val) {
+    public JoystickEvent(JoystickEvent.eventType type, long time, int id, int axisId, double val) {
         this.eventType = type;
         this.stickId = id;
         this.id = axisId;
@@ -98,13 +101,13 @@ class JoystickEvent {
      * @return The current value of the axis, if it is a AXIS event, and null otherwise.
      */
     public Double getVal() {
-        return val != null ? val : null;
+        return val != null ? val: null;
     }
 
     /**
-     * @return The type of event this event is.
+     * @return The eventType of event this event is.
      */
-    public JoystickEvent.type getEventType() {
+    public JoystickEvent.eventType getEventType() {
         return eventType;
     }
 
@@ -119,7 +122,7 @@ class JoystickEvent {
      * @return The value of the POV switch, if it is a POV event, and null otherwise.
      */
     public Integer getPOVValue() {
-        return this.eventType == type.POV ? val.intValue() : null;
+        return this.eventType == POV ? val.intValue(): null;
     }
 
     /**
@@ -150,7 +153,9 @@ class JoystickEvent {
                 str += "POV";
                 break;
         }
-        return str + ',' + stickId + ',' + id + ',' + (eventType == type.AXIS ? (String.valueOf(val) + ',') : "") + '\n';
+        return str + ',' + stickId + ',' + id + ',' +
+               (eventType == AXIS ? String.valueOf(val) + ',':
+                eventType == POV ? String.valueOf(val.intValue()): "") + '\n';
     }
 
     /**
@@ -159,11 +164,10 @@ class JoystickEvent {
      * @return This event as a human-readable string.
      */
     public String toReadableString() {
-        fmt = fmt == null ? new SimpleDateFormat("MM/dd/yyyy hh:mm:ss") : fmt; //Create the date formatter if it does not exist.
+        fmt = fmt == null ? new SimpleDateFormat("MM/dd/yyyy hh:mm:ss"): fmt; //Create the date formatter if it does not exist.
         return String.format(Locale.ENGLISH, "%s: Joystick %d's %s%s%s\n", fmt.format(time), stickId,
-                eventType == type.PRESS || eventType == type.RELEASE ? "Button " : eventType == type.AXIS ? "Axis" : "POV",
-                eventType == type.POV ? "" : id + " ",
-                eventType == type.PRESS ? "pressed." : eventType == type.RELEASE ? "released." : eventType == type.AXIS ? "set to " + val : "set to " + id);
+                             eventType == PRESS || eventType == RELEASE ? "Button ": eventType == AXIS ? "Axis": "POV", " ",
+                             eventType == PRESS ? "pressed.": eventType == RELEASE ? "released.": eventType == AXIS ? "set to " + val: "set to " + val);
     }
 
     /**
@@ -173,15 +177,18 @@ class JoystickEvent {
      * @return If they are equal.
      */
     public boolean equals(JoystickEvent that) { //Fun. If you let IntelliJ simplify it all the way down, it becomes a one-liner!
-        return this == that || that != null && !(this.stickId != that.stickId || this.id != that.id || this.time != that.time || this.eventType != that.eventType) && (this.val != null ? this.val.equals(that.val) : that.val == null);
+        return this == that ||
+               that != null && this.stickId == that.stickId && this.id == that.id && this.time == that.time &&
+               this.eventType == that.eventType && (this.val != null ? this.val.equals(that.val): that.val == null);
     }
 
     /**
      * Returns the hashcode of the given object, using {@link #stickId}, {@link #id}, and {@link #val}.
+     *
      * @return The hashcode of the given object, using {@link #stickId}, {@link #id}, and {@link #val}.
      */
     @Override
     public int hashCode() {
-        return ((eventType.hashCode() * 31 + stickId) * 31 + id) * 31 + (val != null ? val.hashCode() : 0);
+        return ((eventType.hashCode() * 31 + stickId) * 31 + id) * 31 + (val != null ? val.hashCode(): 0);
     }
 }

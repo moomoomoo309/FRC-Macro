@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static FRCMacro.JoystickEvent.type.*; //This is so you can use PRESS instead of JoystickEvent.type.PRESS.
+import static FRCMacro.JoystickEvent.eventType.*; //This is so you can use PRESS instead of JoystickEvent.eventType.PRESS.
 
 /**
  * An example IterativeRobot class implementing Macro recording, Macro playback, storing and reading values from a config file,
@@ -40,7 +40,7 @@ public class ExampleMacroRobot extends IterativeRobot {
     private static simulatedJoystick driveStick;
     private static simulatedJoystick auxStick;
     private static final SendableChooser autoChooser = new SendableChooser();
-    private static Macro currentMacro = null; //Used to keep track of the current macro
+    private static Macro currentMacro; //Used to keep track of the current macro
     private static MacroHelper macroHelper;
     private static final HashMap<JoystickEvent, Runnable> methods = new HashMap<>();
 
@@ -145,12 +145,12 @@ public class ExampleMacroRobot extends IterativeRobot {
     /**
      * Adds a new method to run on a given JoystickEvent.
      *
-     * @param type The type of event (PRESS,RELEASE,AXIS,POV)
+     * @param type The eventType of event (PRESS,RELEASE,AXIS,POV)
      * @param stickId The ID of the Joystick
      * @param id The ID of the button/axis or the value of the POV
      * @param method The method to run
      */
-    public void addJoystickMethod(JoystickEvent.type type, int id, int stickId, Runnable method) {
+    public void addJoystickMethod(JoystickEvent.eventType type, int id, int stickId, Runnable method) {
         methods.put(new JoystickEvent(type, stickId, id), method);
     }
 

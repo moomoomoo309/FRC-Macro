@@ -161,9 +161,9 @@ public class MacroHelper {
     }
 
     /**
-     * Adds an auton type with the specified name.
+     * Adds an auton eventType with the specified name.
      *
-     * @param name The name of the auton type.
+     * @param name The name of the auton eventType.
      */
     public void addAutonMode(String name) {
         autoChooser.addObject(name, name);

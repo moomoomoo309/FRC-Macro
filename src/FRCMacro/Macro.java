@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static FRCMacro.JoystickEvent.type.*;
+import static FRCMacro.JoystickEvent.eventType.*;
 
 /**
  * Allows recording during teleop, and playback of those recordings during autonomous.
@@ -25,6 +25,8 @@ public class Macro {
     private boolean playing;
     private boolean recording;
     private final int maxLength = 15000; //15 seconds for autonomous.
+    private final byte macroFormatVersion; //In case the format changes and you want to convert...
+    public static final byte currentMacroFormatVersion = 1;
 
     /**
      * All joystick events that occurred during the macro, in chronological order.
@@ -49,6 +51,7 @@ public class Macro {
         initialStateSticks = new HashMap<>();
         for (int i = 0; i < this.sticks.length; i++)
             initialStateSticks.put(ids[i], new simulatedJoystick(this.sticks[i], ids[i]).update(this.sticks[i]));
+        macroFormatVersion = currentMacroFormatVersion;
     }
 
     /**
@@ -82,7 +85,7 @@ public class Macro {
             initialStateSticks.put(ids[i], new simulatedJoystick(lines[i]));
 
         // Read each event, adding it to the event list in chronological order.
-        for (int i = this.sticks.length + 1; i < lines.length - 1; i++) {
+        for (int i = this.sticks.length + 1; i < lines.length - 2; i++) {
             long time = Long.parseLong(lines[i].substring(0, lines[i].indexOf(':')));
             String[] values = lines[i].substring(lines[i].indexOf(':') + 1).split(",");
             switch (values[0]) {
@@ -100,7 +103,8 @@ public class Macro {
                     break;
             }
         }
-        stopTime = Long.parseLong(lines[lines.length - 1].substring(1));
+        stopTime = Long.parseLong(lines[lines.length - 2].substring(1));
+        macroFormatVersion = Byte.parseByte(lines[lines.length - 1]);
     }
 
     /**
@@ -139,7 +143,7 @@ public class Macro {
      * @return The length, in milliseconds, of the recording, or null if the recording is unfinished or not started.
      */
     public Long length() {
-        return (this.stopTime != null && this.startTime != null) ? this.stopTime - this.startTime : null;
+        return (this.stopTime != null && this.startTime != null) ? this.stopTime - this.startTime: null;
     }
 
     /**
@@ -214,7 +218,7 @@ public class Macro {
         for (int i = 0; i < sticks.length; i++) { //Check all of the sticks for changes
             for (int j = 1; j <= sticks[i].getButtonCount(); j++) //Check if any buttons were pressed or released
                 if (previousStateSticks.get(ids[i]).getRawButton(j) != sticks[i].getRawButton(j)) //Button was pressed or released
-                    events.add(new JoystickEvent(previousStateSticks.get(ids[i]).getRawButton(i) ? RELEASE : PRESS, i, j));
+                    events.add(new JoystickEvent(previousStateSticks.get(ids[i]).getRawButton(i) ? RELEASE: PRESS, i, j));
 
             for (int j = 0; j < sticks[i].getAxisCount(); j++) //Check if any axes moved
                 if (previousStateSticks.get(ids[i]).getRawAxis(j) != sticks[i].getRawAxis(j)) //Axis moved
@@ -269,7 +273,7 @@ public class Macro {
         for (int j : ids)
             str.append(initialStateSticks.get(j)).append('\n');
         events.forEach(str::append); //If you know what a for-each loop does, you can guess what this does.
-        return str.append('}').append(this.stopTime).append('\n').toString();
+        return str.append('}').append(this.stopTime).append('\n').append(macroFormatVersion).toString();
     }
 
     /**
@@ -285,6 +289,6 @@ public class Macro {
             str.append(initialStateSticks.get(j).toReadableString()).append('\n');
         for (JoystickEvent event : events) //There's a lot of these, which is why I use a StringBuilder.
             str.append(event.toReadableString());
-        return str.append("} Stop time ").append(this.stopTime).append('\n').toString();
+        return str.append("} Stop time ").append(this.stopTime).append('\n').append(macroFormatVersion).toString();
     }
 }
