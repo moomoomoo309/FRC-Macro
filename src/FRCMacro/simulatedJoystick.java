@@ -312,7 +312,7 @@ class simulatedJoystick {
         for (int i = 0; i < j.getPOVCount(); i++) {
             currentPosition = j.getPOV(i);
             if (this.POVs[i] != currentPosition) {
-                this.setPOV(i, (int) currentPosition);
+                this.setPOV(i, (int) Math.round(currentPosition));
                 events.add(new JoystickEvent(POV, id, i, currentPosition));
             }
         }

@@ -1,10 +1,12 @@
 package FRCMacro;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.MotorSafety;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static FRCMacro.JoystickEvent.eventType.*; //This is so you can use PRESS instead of JoystickEvent.eventType.PRESS.
@@ -49,7 +51,7 @@ public class ExampleMacroRobot extends IterativeRobot {
         realAuxStick = new Joystick(auxStickId);
         driveStick = new simulatedJoystick(realDriveStick, driveStickId);
         auxStick = new simulatedJoystick(realAuxStick, auxStickId);
-        macroHelper = new MacroHelper(macroDir, autoChooser, new int[] {driveStickId, auxStickId}, realDriveStick, realAuxStick);
+        macroHelper = new MacroHelper(macroDir, autoChooser, new int[]{driveStickId, auxStickId}, realDriveStick, realAuxStick);
         macroHelper.addExistingMacrosToSendableChooser(); //The method name should explain itself, if not the JavaDoc.
         addJoystickMethods();
         loadVarsFromConfig();
@@ -59,10 +61,10 @@ public class ExampleMacroRobot extends IterativeRobot {
      * Registers all of the methods to be run on joystick events.
      */
     public void addJoystickMethods() {
-        addJoystickMethod(PRESS, recordButtonID, driveStickId, () -> {
+        addJoystickMethod(PRESS, recordButtonID, driveStickId, () -> { //When the record button on the drive stick is pressed...
             try {
-                macroHelper.startOrStopMacro(currentMacro);
-            } catch (Exception e) {
+                macroHelper.startOrStopMacro(currentMacro); //Start/stop the macro!
+            } catch (IOException e) {
                 if (debug)
                     e.printStackTrace();
                 System.err.println("Could not access the macro, not starting/stopping...");
@@ -82,7 +84,7 @@ public class ExampleMacroRobot extends IterativeRobot {
         } catch (IOException e) { //You can't access the file for some reason.
             if (debug)
                 e.printStackTrace();
-            System.err.println("Could not read config at "+configDir+'.');
+            System.err.println("Could not read config at " + configDir + '.');
             return false;
         }
         //The try and catch is pretty tedious, but it's nice to know which ones failed to load, which is why I use them.
@@ -112,7 +114,7 @@ public class ExampleMacroRobot extends IterativeRobot {
         String vars = String.valueOf(minSpeed) + '\n' + maxSpeed; //Add more variables with '\n' between as necessary.
         try {
             MacroHelper.overwriteFile(configDir, vars);
-        }catch(Exception e) {
+        } catch (IOException e) {
             if (debug)
                 e.printStackTrace();
             System.err.println("Could not update config.");
@@ -122,10 +124,10 @@ public class ExampleMacroRobot extends IterativeRobot {
     }
 
     public void autonomousPeriodic() {
-        Boolean runMacro=null;
+        Boolean runMacro = null;
         try {
             runMacro = macroHelper.autonMacro(currentMacro);
-        }catch (Exception e) {
+        } catch (Exception e) {
             if (debug)
                 e.printStackTrace();
             System.err.println("Could not load macro at " + macroDir + macroHelper.getSelectedAuton().substring(5));
@@ -136,7 +138,7 @@ public class ExampleMacroRobot extends IterativeRobot {
             else
                 stopRobot(); //Put your motors in here!
         else
-            switch(macroHelper.getSelectedAuton()) {
+            switch (macroHelper.getSelectedAuton()) {
                 case "example":
                     break;
             }
@@ -145,10 +147,10 @@ public class ExampleMacroRobot extends IterativeRobot {
     /**
      * Adds a new method to run on a given JoystickEvent.
      *
-     * @param type The eventType of event (PRESS,RELEASE,AXIS,POV)
+     * @param type    The eventType of event (PRESS,RELEASE,AXIS,POV)
      * @param stickId The ID of the Joystick
-     * @param id The ID of the button/axis or the value of the POV
-     * @param method The method to run
+     * @param id      The ID of the button/axis or the value of the POV
+     * @param method  The method to run
      */
     public void addJoystickMethod(JoystickEvent.eventType type, int id, int stickId, Runnable method) {
         methods.put(new JoystickEvent(type, stickId, id), method);
@@ -157,7 +159,7 @@ public class ExampleMacroRobot extends IterativeRobot {
     /**
      * Adds a new method to run on a given JoystickEvent.
      *
-     * @param j The JoystickEvent for the method to run on
+     * @param j      The JoystickEvent for the method to run on
      * @param method The method to run on the given event.
      */
     public void addJoystickMethod(JoystickEvent j, Runnable method) {
@@ -185,15 +187,14 @@ public class ExampleMacroRobot extends IterativeRobot {
      * example, implements {@link MotorSafety} or {@link SpeedController}, so it'll work fine.
      *
      * @param motors All motors which need to be stopped. Can be passed as varargs or as an array. (in the form
-     * "motor1,motor2,motor3" or "new MotorSafety[] {motor1,motor2,motor3}" will both work)
+     *               "motor1,motor2,motor3" or "new MotorSafety[] {motor1,motor2,motor3}" will both work)
      */
     public static void stopRobot(Object... motors) {
-        Arrays.stream(motors).forEach(motor -> {
+        for (Object motor : motors)
             if (motor instanceof SpeedController)
                 ((SpeedController) motor).set(0);
             else if (motor instanceof MotorSafety)
                 ((MotorSafety) motor).stopMotor();
-        });
     }
 
     /**
@@ -203,9 +204,9 @@ public class ExampleMacroRobot extends IterativeRobot {
      * example, implements {@link MotorSafety} or {@link SpeedController}, so it'll work fine.
      *
      * @param preFunction Any function you want run before stopping all of the motors. (Like if you need to move back an arm or something).<br>
-     * Feel free to pass it a lambda like "()->Robot.doSomething()" or "()->{Robot.doSomething(); Robot.doSomethingElse(); }".
-     * @param motors All motors which need to be stopped. Can be passed as varargs or as an array. (in the form
-     * "motor1,motor2,motor3" or "new MotorSafety[] {motor1,motor2,motor3}" will both work)
+     *                    Feel free to pass it a lambda like "()->Robot.doSomething()" or "()->{Robot.doSomething(); Robot.doSomethingElse(); }".
+     * @param motors      All motors which need to be stopped. Can be passed as varargs or as an array. (in the form
+     *                    "motor1,motor2,motor3" or "new MotorSafety[] {motor1,motor2,motor3}" will both work)
      */
     public static void stopRobot(Runnable preFunction, Object... motors) {
         preFunction.run();
