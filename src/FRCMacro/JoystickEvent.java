@@ -112,14 +112,14 @@ class JoystickEvent {
      * @return The id of the button if it is not a POV event, and null otherwise.
      */
     public Integer getID() {
-        return this.eventType != type.POV ? id : null;
+        return id;
     }
 
     /**
      * @return The value of the POV switch, if it is a POV event, and null otherwise.
      */
     public Integer getPOVValue() {
-        return this.eventType == type.POV ? id : null;
+        return this.eventType == type.POV ? val.intValue() : null;
     }
 
     /**

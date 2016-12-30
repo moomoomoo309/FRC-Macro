@@ -174,7 +174,7 @@ public class Macro {
                         sticks[event.getStickId()].setButton(event.getID(), false);
                         break;
                     case POV:
-                        sticks[event.getStickId()].setPOV(event.getPOVValue());
+                        sticks[event.getStickId()].setPOV(event.getID(), event.getPOVValue());
                         break;
                     case AXIS:
                         sticks[event.getStickId()].setAxis(event.getID(), event.getVal());
