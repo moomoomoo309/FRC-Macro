@@ -165,9 +165,9 @@ class JoystickEvent {
      */
     public String toReadableString() {
         fmt = fmt == null ? new SimpleDateFormat("MM/dd/yyyy hh:mm:ss"): fmt; //Create the date formatter if it does not exist.
-        return String.format(Locale.ENGLISH, "%s: Joystick %d's %s%s%s\n", fmt.format(time), stickId,
-                             eventType == PRESS || eventType == RELEASE ? "Button ": eventType == AXIS ? "Axis": "POV", " ",
-                             eventType == PRESS ? "pressed.": eventType == RELEASE ? "released.": eventType == AXIS ? "set to " + val: "set to " + val);
+        return String.format(Locale.ENGLISH, "%s: Joystick %d's %s %s\n", fmt.format(time), stickId,
+                             eventType == PRESS || eventType == RELEASE ? "Button ": eventType == AXIS ? "Axis": "POV",
+                             eventType == PRESS ? "pressed.": eventType == RELEASE ? "released.": ("set to " + val));
     }
 
     /**
@@ -183,9 +183,9 @@ class JoystickEvent {
     }
 
     /**
-     * Returns the hashcode of the given object, using {@link #stickId}, {@link #id}, and {@link #val}.
+     * Returns the hashcode of the given object, using {@link #stickId}, {@link #id}, and {@link #val}, but not {@link #time}.
      *
-     * @return The hashcode of the given object, using {@link #stickId}, {@link #id}, and {@link #val}.
+     * @return The hashcode of the given object, using {@link #stickId}, {@link #id}, and {@link #val}, but not {@link #time}.
      */
     @Override
     public int hashCode() {

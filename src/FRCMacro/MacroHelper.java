@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * A helper class containing all logic needed to implement {@link Macro} into an {@link edu.wpi.first.wpilibj.IterativeRobot IterativeRobot} class.
+ *
  * @author Nicholas DeLello
  */
 public class MacroHelper {
@@ -103,7 +104,7 @@ public class MacroHelper {
      */
     public static void overwriteFile(String fileDirectory, String info) throws IOException {
         Files.write(Paths.get(fileDirectory), info.getBytes("utf8"), StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+                    StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
     }
 
     /**
@@ -121,9 +122,8 @@ public class MacroHelper {
                 if (filenames == null)
                     throw new FileNotFoundException("The directory " + macroDir + " is not a folder!");
                 for (File f : filenames)
-                    if (f.getName().equals(String.valueOf(currentFileNumber))) {
+                    if (f.getName().equals(String.valueOf(currentFileNumber)))
                         break getFileNumber;
-                    }
                 currentFileNumber++;
             }
         }

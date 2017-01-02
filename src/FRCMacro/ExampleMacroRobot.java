@@ -63,7 +63,7 @@ public class ExampleMacroRobot extends IterativeRobot {
     public void addJoystickMethods() {
         addJoystickMethod(PRESS, recordButtonID, driveStickId, () -> { //When the record button on the drive stick is pressed...
             try {
-                macroHelper.startOrStopMacro(currentMacro); //Start/stop the macro!
+                macroHelper.startOrStopMacro(currentMacro); //Start or stop the macro!
             } catch (IOException e) {
                 if (debug)
                     e.printStackTrace();
@@ -75,11 +75,11 @@ public class ExampleMacroRobot extends IterativeRobot {
     /**
      * Loads variables from the config file, if possible.
      *
-     * @return If the variables could be successfully loaded.
+     * @return If the config file could be read.
      */
     private boolean loadVarsFromConfig() { //Example to load variables from config
         String[] configFile;
-        try {
+        try { //Read the config
             configFile = MacroHelper.readFile(configDir);
         } catch (IOException e) { //You can't access the file for some reason.
             if (debug)
@@ -87,6 +87,7 @@ public class ExampleMacroRobot extends IterativeRobot {
             System.err.println("Could not read config at " + configDir + '.');
             return false;
         }
+
         //The try and catch is pretty tedious, but it's nice to know which ones failed to load, which is why I use them.
         try {
             minSpeed = Double.parseDouble(configFile[0]); //If it's an int, not a double, use Integer.parseInt().

@@ -25,7 +25,8 @@ public class Macro {
     private boolean playing;
     private boolean recording;
     private final int maxLength = 15000; //15 seconds for autonomous.
-    private final byte macroFormatVersion; //In case the format changes and you want to convert...
+    //In case the format changes and you want to convert...
+    private final byte macroFormatVersion;
     public static final byte currentMacroFormatVersion = 1;
 
     /**
