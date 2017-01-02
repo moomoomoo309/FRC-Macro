@@ -83,7 +83,7 @@ public class Macro {
         // Read the initial state of each stick
         initialStateSticks = new HashMap<>();
         for (int i = 1; i <= this.sticks.length; i++)
-            initialStateSticks.put(ids[i], new simulatedJoystick(lines[i]));
+            initialStateSticks.put(ids[i - 1], new simulatedJoystick(lines[i]));
 
         // Read each event, adding it to the event list in chronological order.
         for (int i = this.sticks.length + 1; i < lines.length - 2; i++) {
@@ -225,8 +225,8 @@ public class Macro {
                 if (previousStateSticks.get(ids[i]).getRawAxis(j) != sticks[i].getRawAxis(j)) //Axis moved
                     events.add(new JoystickEvent(AXIS, i, j, sticks[i].getRawAxis(j)));
 
-            for (int j = 0; j < sticks[i].getPOVCount(); j++)
-                if (previousStateSticks.get(ids[i]).getPOV(j) != sticks[i].getPOV(j)) //POV switch was moved
+            for (int j = 0; j < sticks[i].getPOVCount(); j++) //Check if any POV switch was moved
+                if (previousStateSticks.get(ids[i]).getPOV(j) != sticks[i].getPOV(j))
                     events.add(new JoystickEvent(POV, i, j, (double) sticks[i].getPOV(j)));
             previousStateSticks.get(ids[i]).update(sticks[i]); //Update the last state for next time
         }
@@ -274,7 +274,7 @@ public class Macro {
         for (int j : ids)
             str.append(initialStateSticks.get(j)).append('\n');
         events.forEach(str::append); //If you know what a for-each loop does, you can guess what this does.
-        return str.append('}').append(this.stopTime).append('\n').append(macroFormatVersion).toString();
+        return str.append('}').append(this.stopTime).append("\nMacro Format Version: ").append(macroFormatVersion).toString();
     }
 
     /**
@@ -282,7 +282,6 @@ public class Macro {
      *
      * @return This as a human-readable string.
      */
-
     public String toReadableString() {
         StringBuilder str = new StringBuilder();
         str.append("{ Start time: ").append(this.startTime).append('\n');
