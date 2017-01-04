@@ -46,12 +46,12 @@ public class Macro {
         this.sticks = sticks;
         this.ids = ids;
         previousStateSticks = new HashMap<>();
-        for (int i = 0; i < this.sticks.length; i++)
-            previousStateSticks.put(ids[i], new simulatedJoystick(this.sticks[i], ids[i]).update(this.sticks[i]));
-        // initialStateSticks cannot have pointers to previousStateSticks in it. Each simulatedJoystick must be new.
         initialStateSticks = new HashMap<>();
-        for (int i = 0; i < this.sticks.length; i++)
+        for (int i = 0; i < this.sticks.length; i++) {
+            previousStateSticks.put(ids[i], new simulatedJoystick(this.sticks[i], ids[i]).update(this.sticks[i]));
+            // initialStateSticks cannot have pointers to previousStateSticks in it. Each simulatedJoystick must be new.
             initialStateSticks.put(ids[i], new simulatedJoystick(this.sticks[i], ids[i]).update(this.sticks[i]));
+        }
         macroFormatVersion = currentMacroFormatVersion;
     }
 
@@ -274,7 +274,7 @@ public class Macro {
         for (int j : ids)
             str.append(initialStateSticks.get(j)).append('\n');
         events.forEach(str::append); //If you know what a for-each loop does, you can guess what this does.
-        return str.append('}').append(this.stopTime).append("\nMacro Format Version: ").append(macroFormatVersion).toString();
+        return str.append('}').append(this.stopTime).append('\n').append(macroFormatVersion).toString();
     }
 
     /**
@@ -289,6 +289,6 @@ public class Macro {
             str.append(initialStateSticks.get(j).toReadableString()).append('\n');
         for (JoystickEvent event : events) //There's a lot of these, which is why I use a StringBuilder.
             str.append(event.toReadableString());
-        return str.append("} Stop time ").append(this.stopTime).append('\n').append(macroFormatVersion).toString();
+        return str.append("} Stop time ").append(this.stopTime).append("\nMacro Format Version: ").append(macroFormatVersion).toString();
     }
 }
