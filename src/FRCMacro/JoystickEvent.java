@@ -29,9 +29,9 @@ class JoystickEvent {
     private static SimpleDateFormat fmt;
 
     /**
-     * Creates a joystick event. (JoystickEvent.eventType.PRESS/RELEASE/POV)
+     * Creates a joystick event. (JoystickEvent.eventType.PRESS/RELEASE)
      *
-     * @param type  The eventType of event (JoystickEvent.eventType.PRESS/RELEASE/POV)
+     * @param type  The eventType of event (JoystickEvent.eventType.PRESS/RELEASE)
      * @param id    The id of the joystick being used.
      * @param btnId The id of the button being pressed/released.
      */
@@ -74,9 +74,9 @@ class JoystickEvent {
     }
 
     /**
-     * Creates a joystick event. (Axis)
+     * Creates a joystick event. (JoystickEvent.eventType.AXIS/POV)
      *
-     * @param type   The eventType of event (JoystickEvent.eventType.AXIS)
+     * @param type   The eventType of event (JoystickEvent.eventType.AXIS/POV)
      * @param time   The time, in milliseconds, the event occurred. (from System.currentTimeMillis())
      * @param id     The id of the joystick being used.
      * @param axisId The id of the axis being changed.
