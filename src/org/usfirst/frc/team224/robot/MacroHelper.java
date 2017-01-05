@@ -1,5 +1,4 @@
-package FRCMacro;
-
+package org.usfirst.frc.team224.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

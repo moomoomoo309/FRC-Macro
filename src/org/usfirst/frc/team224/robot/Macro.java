@@ -1,11 +1,8 @@
-package FRCMacro;
-
+package org.usfirst.frc.team224.robot;
 import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static FRCMacro.JoystickEvent.eventType.*;
 
 /**
  * Allows recording during teleop, and playback of those recordings during autonomous.
@@ -91,16 +88,16 @@ public class Macro {
             String[] values = lines[i].substring(lines[i].indexOf(':') + 1).split(",");
             switch (values[0]) {
                 case "press":
-                    events.add(new JoystickEvent(PRESS, time, Integer.parseInt(values[1]), Integer.parseInt(values[2])));
+                    events.add(new JoystickEvent(JoystickEvent.eventType.PRESS, time, Integer.parseInt(values[1]), Integer.parseInt(values[2])));
                     break;
                 case "release":
-                    events.add(new JoystickEvent(RELEASE, time, Integer.parseInt(values[1]), Integer.parseInt(values[2])));
+                    events.add(new JoystickEvent(JoystickEvent.eventType.RELEASE, time, Integer.parseInt(values[1]), Integer.parseInt(values[2])));
                     break;
                 case "axis":
-                    events.add(new JoystickEvent(AXIS, time, Integer.parseInt(values[1]), Integer.parseInt(values[2]), Double.parseDouble(values[3])));
+                    events.add(new JoystickEvent(JoystickEvent.eventType.AXIS, time, Integer.parseInt(values[1]), Integer.parseInt(values[2]), Double.parseDouble(values[3])));
                     break;
                 case "POV":
-                    events.add(new JoystickEvent(POV, time, Integer.parseInt(values[1]), Integer.parseInt(values[2]), (double) Integer.parseInt(values[3])));
+                    events.add(new JoystickEvent(JoystickEvent.eventType.POV, time, Integer.parseInt(values[1]), Integer.parseInt(values[2]), (double) Integer.parseInt(values[3])));
                     break;
             }
         }
@@ -219,15 +216,15 @@ public class Macro {
         for (int i = 0; i < sticks.length; i++) { //Check all of the sticks for changes
             for (int j = 1; j <= sticks[i].getButtonCount(); j++) //Check if any buttons were pressed or released
                 if (previousStateSticks.get(ids[i]).getRawButton(j) != sticks[i].getRawButton(j)) //Button was pressed or released
-                    events.add(new JoystickEvent(previousStateSticks.get(ids[i]).getRawButton(i) ? RELEASE: PRESS, i, j));
+                    events.add(new JoystickEvent(previousStateSticks.get(ids[i]).getRawButton(i) ? JoystickEvent.eventType.RELEASE: JoystickEvent.eventType.PRESS, i, j));
 
             for (int j = 0; j < sticks[i].getAxisCount(); j++) //Check if any axes moved
                 if (previousStateSticks.get(ids[i]).getRawAxis(j) != sticks[i].getRawAxis(j)) //Axis moved
-                    events.add(new JoystickEvent(AXIS, i, j, sticks[i].getRawAxis(j)));
+                    events.add(new JoystickEvent(JoystickEvent.eventType.AXIS, i, j, sticks[i].getRawAxis(j)));
 
             for (int j = 0; j < sticks[i].getPOVCount(); j++) //Check if any POV switch was moved
                 if (previousStateSticks.get(ids[i]).getPOV(j) != sticks[i].getPOV(j))
-                    events.add(new JoystickEvent(POV, i, j, (double) sticks[i].getPOV(j)));
+                    events.add(new JoystickEvent(JoystickEvent.eventType.POV, i, j, (double) sticks[i].getPOV(j)));
             previousStateSticks.get(ids[i]).update(sticks[i]); //Update the last state for next time
         }
     }

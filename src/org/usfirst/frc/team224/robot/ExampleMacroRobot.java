@@ -1,5 +1,4 @@
-package FRCMacro;
-
+package org.usfirst.frc.team224.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.MotorSafety;
@@ -8,8 +7,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import java.io.IOException;
 import java.util.HashMap;
-
-import static FRCMacro.JoystickEvent.eventType.*; //This is so you can use PRESS instead of JoystickEvent.eventType.PRESS.
 
 /**
  * An example IterativeRobot class implementing Macro recording, Macro playback, storing and reading values from a config file,
@@ -61,7 +58,7 @@ public class ExampleMacroRobot extends IterativeRobot {
      * Registers all of the methods to be run on joystick events.
      */
     public void addJoystickMethods() {
-        addJoystickMethod(PRESS, recordButtonID, driveStickId, () -> { //When the record button on the drive stick is pressed...
+        addJoystickMethod(JoystickEvent.eventType.PRESS, recordButtonID, driveStickId, () -> { //When the record button on the drive stick is pressed...
             try {
                 macroHelper.startOrStopMacro(currentMacro); //Start or stop the macro!
             } catch (IOException e) {
@@ -70,6 +67,10 @@ public class ExampleMacroRobot extends IterativeRobot {
                 System.err.println("Could not access the macro, not starting/stopping...");
             }
         });
+        for (int i=1; i<=driveStick.getButtonCount(); i++) {
+            int i2=i; //It has to be final, thus this variable.
+            addJoystickMethod(JoystickEvent.eventType.PRESS, i, auxStickId, () -> System.out.println("ID: " +i2));
+        }
     }
 
     /**

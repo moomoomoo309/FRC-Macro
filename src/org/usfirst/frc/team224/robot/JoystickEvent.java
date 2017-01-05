@@ -1,9 +1,6 @@
-package FRCMacro;
-
+package org.usfirst.frc.team224.robot;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-
-import static FRCMacro.JoystickEvent.eventType.*;
 
 /**
  * An object representing a change in the state of a joystick, and when it occurred.
@@ -13,7 +10,6 @@ import static FRCMacro.JoystickEvent.eventType.*;
  * @see Macro
  */
 class JoystickEvent {
-
     /**
      * The eventType of event, whether a button was pressed, a button was released, an axis was moved, or a pov switch moved.
      */
@@ -122,7 +118,7 @@ class JoystickEvent {
      * @return The value of the POV switch, if it is a POV event, and null otherwise.
      */
     public Integer getPOVValue() {
-        return this.eventType == POV ? val.intValue(): null;
+        return this.eventType == eventType.POV ? val.intValue(): null;
     }
 
     /**
@@ -154,8 +150,37 @@ class JoystickEvent {
                 break;
         }
         return str + ',' + stickId + ',' + id + ',' +
-               (eventType == AXIS ? String.valueOf(val) + ',':
-                eventType == POV ? String.valueOf(val.intValue()): "") + '\n';
+               (eventType == eventType.AXIS ? String.valueOf(val) + ',':
+                eventType == eventType.POV ? String.valueOf(val.intValue()): "") + '\n';
+    }
+
+    /**
+     * Checks if the given JoystickEvent has the same {@link #id}, {@link eventType}, and {@link #stickId}.
+     * @param o The object to check for equality
+     * @return If the two objects have the same {@link #id}, {@link eventType}, and {@link #stickId}.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        JoystickEvent that = (JoystickEvent) o;
+
+        return getStickId() == that.getStickId() && id == that.id && getEventType() == that.getEventType();
+    }
+
+    /**
+     * Returns the hashcode for this object, looking at {@link #id}, {@link eventType}, and {@link #stickId}.
+     * @return The hashcode for this object, looking at {@link #id}, {@link eventType}, and {@link #stickId}.
+     */
+    @Override
+    public int hashCode() {
+        int result = getEventType() != null ? getEventType().hashCode(): 0;
+        result = 31 * result + getStickId();
+        result = 31 * result + id;
+        return result;
     }
 
     /**
@@ -166,29 +191,8 @@ class JoystickEvent {
     public String toReadableString() {
         fmt = fmt == null ? new SimpleDateFormat("MM/dd/yyyy hh:mm:ss"): fmt; //Create the date formatter if it does not exist.
         return String.format(Locale.ENGLISH, "%s: Joystick %d's %s %s\n", fmt.format(time), stickId,
-                             eventType == PRESS || eventType == RELEASE ? "Button ": eventType == AXIS ? "Axis": "POV",
-                             eventType == PRESS ? "pressed.": eventType == RELEASE ? "released.": ("set to " + val));
+                             eventType == eventType.PRESS || eventType == eventType.RELEASE ? "Button ": eventType == eventType.AXIS ? "Axis": "POV",
+                             eventType == eventType.PRESS ? "pressed.": eventType == eventType.RELEASE ? "released.": ("set to " + val));
     }
 
-    /**
-     * Returns if the provided {@link JoystickEvent} is the same as this one.
-     *
-     * @param that The {@link JoystickEvent} to check for equality.
-     * @return If they are equal.
-     */
-    public boolean equals(JoystickEvent that) { //Fun. If you let IntelliJ simplify it all the way down, it becomes a one-liner!
-        return this == that ||
-               that != null && this.stickId == that.stickId && this.id == that.id && this.time == that.time &&
-               this.eventType == that.eventType && (this.val != null ? this.val.equals(that.val): that.val == null);
-    }
-
-    /**
-     * Returns the hashcode of the given object, using {@link #stickId}, {@link #id}, and {@link #val}, but not {@link #time}.
-     *
-     * @return The hashcode of the given object, using {@link #stickId}, {@link #id}, and {@link #val}, but not {@link #time}.
-     */
-    @Override
-    public int hashCode() {
-        return ((eventType.hashCode() * 31 + stickId) * 31 + id) * 31 + (val != null ? val.hashCode(): 0);
-    }
 }

@@ -1,12 +1,9 @@
-package FRCMacro;
-
+package org.usfirst.frc.team224.robot;
 import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.IntStream;
-
-import static FRCMacro.JoystickEvent.eventType.*;
 
 /**
  * A class acting as an abstraction layer between a {@link Joystick} and a {@link Macro}.
@@ -297,23 +294,23 @@ class simulatedJoystick {
         events.clear();
         for (int i = 1; i <= j.getButtonCount(); i++) {
             currentState = j.getRawButton(i);
-            if (this.buttons[i] != currentState) {
+            if (this.buttons[i-1] != currentState) {
                 this.setButton(i, currentState);
-                events.add(new JoystickEvent(currentState ? PRESS : RELEASE, id, i));
+                events.add(new JoystickEvent(currentState ? JoystickEvent.eventType.PRESS : JoystickEvent.eventType.RELEASE, 0L, id, i));
             }
         }
         for (int i = 0; i < j.getAxisCount(); i++) {
             currentPosition = j.getRawAxis(i);
             if (this.axes[i] != currentPosition) {
                 this.setAxis(i, currentPosition);
-                events.add(new JoystickEvent(AXIS, id, i, currentPosition));
+                events.add(new JoystickEvent(JoystickEvent.eventType.AXIS, 0L, id, i, currentPosition));
             }
         }
         for (int i = 0; i < j.getPOVCount(); i++) {
             currentPosition = j.getPOV(i);
             if (this.POVs[i] != currentPosition) {
                 this.setPOV(i, (int) Math.round(currentPosition));
-                events.add(new JoystickEvent(POV, id, i, currentPosition));
+                events.add(new JoystickEvent(JoystickEvent.eventType.POV, 0L, id, i, currentPosition));
             }
         }
         return events;
