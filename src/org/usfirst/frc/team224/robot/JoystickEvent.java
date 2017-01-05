@@ -177,7 +177,7 @@ class JoystickEvent {
      */
     @Override
     public int hashCode() {
-        int result = getEventType() != null ? getEventType().hashCode(): 0;
+        int result = getEventType().hashCode();
         result = 31 * result + getStickId();
         result = 31 * result + id;
         return result;
