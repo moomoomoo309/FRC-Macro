@@ -2,6 +2,7 @@ package org.usfirst.frc.team224.robot;
 import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -36,12 +37,10 @@ public class Macro {
      *
      * @param sticks An array containing all joysticks being used in the recording.
      */
-    public Macro(Joystick[] sticks, int[] ids) {
+    public Macro(Joystick[] sticks) {
         events = new ArrayList<>();
-        if (sticks.length != ids.length)
-            throw new RuntimeException("Stick array and ID array must be the same size!");
         this.sticks = sticks;
-        this.ids = ids;
+        this.ids = Arrays.stream(sticks).mapToInt(Joystick::getPort).toArray();
         previousStateSticks = new HashMap<>();
         initialStateSticks = new HashMap<>();
         for (int i = 0; i < this.sticks.length; i++) {
@@ -59,8 +58,8 @@ public class Macro {
      * @param sticks      The joysticks used in the recording
      */
 
-    public Macro(String loadedMacro, Joystick[] sticks, int[] ids) {
-        this(loadedMacro.split("\n"), sticks, ids);
+    public Macro(String loadedMacro, Joystick[] sticks) {
+        this(loadedMacro.split("\n"), sticks);
     }
 
     /**
@@ -69,9 +68,9 @@ public class Macro {
      * @param lines  The output from Macro.toString()
      * @param sticks The joysticks used in the recording
      */
-    public Macro(String[] lines, Joystick[] sticks, int[] ids) {
+    public Macro(String[] lines, Joystick[] sticks) {
         this.sticks = sticks;
-        this.ids = ids;
+        this.ids = Arrays.stream(sticks).mapToInt(Joystick::getPort).toArray();
         previousStateSticks = new HashMap<>();
         for (int i = 0; i < this.sticks.length; i++)
             previousStateSticks.put(ids[i], new simulatedJoystick(this.sticks[i], ids[i]).update(this.sticks[i]));
@@ -266,9 +265,9 @@ public class Macro {
      * @return The macro serialized into a string.
      */
     public String toString() {
-        StringBuilder str = new StringBuilder(); //There may be a lot of events, so a StringBuilder is better.
-        str.append('{').append(this.startTime).append('\n');
-        for (int j : ids)
+        //There may be a lot of events, so a StringBuilder is better.
+        StringBuilder str = new StringBuilder("{").append(this.startTime).append('\n');
+        for (int j: ids)
             str.append(initialStateSticks.get(j)).append('\n');
         events.forEach(str::append); //If you know what a for-each loop does, you can guess what this does.
         return str.append('}').append(this.stopTime).append('\n').append(macroFormatVersion).toString();
@@ -280,12 +279,10 @@ public class Macro {
      * @return This as a human-readable string.
      */
     public String toReadableString() {
-        StringBuilder str = new StringBuilder();
-        str.append("{ Start time: ").append(this.startTime).append('\n');
-        for (int j : ids)
+        StringBuilder str = new StringBuilder("{ Start time: ").append(this.startTime).append('\n');
+        for (int j: ids)
             str.append(initialStateSticks.get(j).toReadableString()).append('\n');
-        for (JoystickEvent event : events) //There's a lot of these, which is why I use a StringBuilder.
-            str.append(event.toReadableString());
-        return str.append("} Stop time ").append(this.stopTime).append("\nMacro Format Version: ").append(macroFormatVersion).toString();
+        events.forEach(event->str.append(event.toReadableString())); //There's a lot of these, which is why I use a StringBuilder.
+        return str.append("} Stop time: ").append(this.stopTime).append("\nMacro Format Version: ").append(macroFormatVersion).toString();
     }
 }

@@ -1,11 +1,14 @@
 package org.usfirst.frc.team224.robot;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -38,17 +41,18 @@ public class ExampleMacroRobot extends IterativeRobot {
     private static Joystick realAuxStick;
     private static simulatedJoystick driveStick;
     private static simulatedJoystick auxStick;
-    private static final SendableChooser autoChooser = new SendableChooser();
+    private static final SendableChooser<String> autoChooser = new SendableChooser<>();
     private static Macro currentMacro; //Used to keep track of the current macro
     private static MacroHelper macroHelper;
     private static final HashMap<JoystickEvent, Runnable> methods = new HashMap<>();
+    private static final ArrayList<Runnable> scheduledEvents = new ArrayList<>();
 
     public void robotInit() { //Joysticks work oddly at competition when you initialize them outside of robotInit...
         realDriveStick = new Joystick(driveStickId);
         realAuxStick = new Joystick(auxStickId);
         driveStick = new simulatedJoystick(realDriveStick, driveStickId);
         auxStick = new simulatedJoystick(realAuxStick, auxStickId);
-        macroHelper = new MacroHelper(macroDir, autoChooser, new int[]{driveStickId, auxStickId}, realDriveStick, realAuxStick);
+        macroHelper = new MacroHelper(macroDir, autoChooser, realDriveStick, realAuxStick);
         macroHelper.addExistingMacrosToSendableChooser(); //The method name should explain itself, if not the JavaDoc.
         addJoystickMethods();
         loadVarsFromConfig();
@@ -67,9 +71,9 @@ public class ExampleMacroRobot extends IterativeRobot {
                 System.err.println("Could not access the macro, not starting/stopping...");
             }
         });
-        for (int i=1; i<=driveStick.getButtonCount(); i++) {
-            int i2=i; //It has to be final, thus this variable.
-            addJoystickMethod(JoystickEvent.eventType.PRESS, i, auxStickId, () -> System.out.println("ID: " +i2));
+        for (int i = 1; i <= driveStick.getButtonCount(); i++) {
+            int i2 = i; //It has to be final, thus this variable.
+            addJoystickMethod(JoystickEvent.eventType.PRESS, i, auxStickId, () -> System.out.println("ID: " + i2));
         }
     }
 
@@ -140,7 +144,7 @@ public class ExampleMacroRobot extends IterativeRobot {
             else
                 stopRobot(); //Put your motors in here!
         else
-            switch (macroHelper.getSelectedAuton()) {
+            switch (macroHelper.getSelectedAuton()) { //Non-macro autons
                 case "example":
                     break;
             }
@@ -155,7 +159,7 @@ public class ExampleMacroRobot extends IterativeRobot {
      * @param method  The method to run
      */
     public void addJoystickMethod(JoystickEvent.eventType type, int id, int stickId, Runnable method) {
-        methods.put(new JoystickEvent(type, stickId, id), method);
+        addJoystickMethod(new JoystickEvent(type, stickId, id), method);
     }
 
     /**
@@ -177,15 +181,37 @@ public class ExampleMacroRobot extends IterativeRobot {
         methods.get(j).run();
     }
 
+    /**
+     * Schedules <code>function</code> to run in <code>seconds</code> seconds
+     * @param seconds The number of seconds until <code>function</code> runs
+     * @param function The function to run when <code>seconds</code> seconds has passed.
+     */
+    public void scheduleEvent(double seconds, Runnable function) {
+        Timer timer = new Timer();
+        Runnable finalFunction = new Runnable() {
+            public void run() {
+                if (timer.hasPeriodPassed(seconds)) { //If the time has passed...
+                    function.run(); //Run the function...
+                    timer.stop(); //Stop and reset the timer...
+                    timer.reset();
+                    scheduledEvents.remove(this); //And then remove this from the ArrayList automatically!
+                }
+            }
+        };
+        timer.start();
+        scheduledEvents.add(finalFunction);
+    }
+
     public void teleopPeriodic() { //It drives, has joystick events, and has the throttle.
         driveStick.updateWithEvents(realDriveStick, driveStickId).forEach(this::runJoystickMethod);
         auxStick.updateWithEvents(realAuxStick, auxStickId).forEach(this::runJoystickMethod);
+        scheduledEvents.forEach(Runnable::run); //Check all scheduled events, then run them if ready (they remove themselves from the HashMap)
     }
 
     /**
      * Stops all of the motors, the shooter, or anything else that should be shut off at the end of autonomous.
      * <br><br>
-     * Yes, a {@link edu.wpi.first.wpilibj.CANTalon CANTalon} or {@link edu.wpi.first.wpilibj.RobotDrive RobotDrive}, for
+     * Yes, a CANTalon or {@link edu.wpi.first.wpilibj.RobotDrive RobotDrive}, for
      * example, implements {@link MotorSafety} or {@link SpeedController}, so it'll work fine.
      *
      * @param motors All motors which need to be stopped. Can be passed as varargs or as an array. (in the form
@@ -202,11 +228,11 @@ public class ExampleMacroRobot extends IterativeRobot {
     /**
      * Stops all of the motors, the shooter, or anything else that should be shut off at the end of autonomous.
      * <br><br>
-     * Yes, a {@link edu.wpi.first.wpilibj.CANTalon CANTalon} or {@link edu.wpi.first.wpilibj.RobotDrive RobotDrive}, for
+     * Yes, a {@link com.ctre.CANTalon CANTalon} or {@link edu.wpi.first.wpilibj.RobotDrive RobotDrive}, for
      * example, implements {@link MotorSafety} or {@link SpeedController}, so it'll work fine.
      *
      * @param preFunction Any function you want run before stopping all of the motors. (Like if you need to move back an arm or something).<br>
-     *                    Feel free to pass it a lambda like "()->Robot.doSomething()" or "()->{Robot.doSomething(); Robot.doSomethingElse(); }".
+     *                    Feel free to pass it a lambda.
      * @param motors      All motors which need to be stopped. Can be passed as varargs or as an array. (in the form
      *                    "motor1,motor2,motor3" or "new MotorSafety[] {motor1,motor2,motor3}" will both work)
      */

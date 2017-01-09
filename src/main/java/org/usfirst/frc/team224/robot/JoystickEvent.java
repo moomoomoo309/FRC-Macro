@@ -1,4 +1,5 @@
 package org.usfirst.frc.team224.robot;
+
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -155,7 +156,9 @@ class JoystickEvent {
     }
 
     /**
-     * Checks if the given JoystickEvent has the same {@link #id}, {@link eventType}, and {@link #stickId}.
+     * Checks if the given JoystickEvent has the same {@link #id}, {@link eventType}, and {@link #stickId}.<br>
+     * NOTE: Only checks equality for JoystickEvents, not even subclasses! See method body for subclass implementation.
+     *
      * @param o The object to check for equality
      * @return If the two objects have the same {@link #id}, {@link eventType}, and {@link #stickId}.
      */
@@ -163,16 +166,21 @@ class JoystickEvent {
     public boolean equals(Object o) {
         if (this == o)
             return true;
+
+        //Equivalent to an instanceof call, but no subclasses.
+        //NOTE: If you want to subclass this, change "getClass() != o.getClass()" to "o instanceof JoystickEvent".
+        //The below implementation is normal behavior for .equals(), but in case you want to change it, that's how.
         if (o == null || getClass() != o.getClass())
             return false;
 
         JoystickEvent that = (JoystickEvent) o;
 
-        return getStickId() == that.getStickId() && id == that.id && getEventType() == that.getEventType();
+        return this.stickId == that.stickId && this.id == that.id && this.eventType == that.eventType;
     }
 
     /**
      * Returns the hashcode for this object, looking at {@link #id}, {@link eventType}, and {@link #stickId}.
+     *
      * @return The hashcode for this object, looking at {@link #id}, {@link eventType}, and {@link #stickId}.
      */
     @Override
