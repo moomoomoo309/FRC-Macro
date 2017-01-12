@@ -78,8 +78,8 @@ public class MacroHelper {
                 currentMacro = new Macro(readFile(macroDir + chosenAuton.substring(5)), realSticks, ids);
                 currentMacro.startPlaying();
                 System.out.println("Macro length: " + currentMacro.length() / 1000D + "seconds");
-            } else
-                return currentMacro.isPlaying();
+            }
+            return currentMacro.isPlaying();
         }
         return null;
     }
