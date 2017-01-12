@@ -35,6 +35,7 @@ public class Macro {
      * Creates a macro for recording given the sticks being used.
      *
      * @param sticks An array containing all joysticks being used in the recording.
+     * @param ids    The ids of the joysticks used in the recording.
      */
     public Macro(Joystick[] sticks, int[] ids) {
         events = new ArrayList<>();
@@ -55,6 +56,7 @@ public class Macro {
      *
      * @param loadedMacro The output from Macro.toString()
      * @param sticks      The joysticks used in the recording
+     * @param ids         The ids of the joysticks used in the recording
      */
 
     public Macro(String loadedMacro, Joystick[] sticks, int[] ids) {
@@ -64,8 +66,9 @@ public class Macro {
     /**
      * Loads a saved macro. (given the output from .toString())
      *
-     * @param lines  The output from Macro.toString()
+     * @param lines  The output from Macro.toString(), split by newlines
      * @param sticks The joysticks used in the recording
+     * @param ids    The ids of the joysticks used in the recording
      */
     public Macro(String[] lines, Joystick[] sticks, int[] ids) {
         this.sticks = sticks;
