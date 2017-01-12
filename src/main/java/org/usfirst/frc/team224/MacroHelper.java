@@ -1,4 +1,4 @@
-package org.usfirst.frc.team224.robot;
+package org.usfirst.frc.team224;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

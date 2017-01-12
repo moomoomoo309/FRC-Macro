@@ -1,4 +1,4 @@
-package org.usfirst.frc.team224.robot;
+package org.usfirst.frc.team224;
 import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ class simulatedJoystick {
      * @param id The id of the real joystick this is based on.
      */
     public simulatedJoystick(int id) {
-        this(new Joystick(id), id);
+        this(new Joystick(id));
     }
 
     /**
@@ -31,11 +31,11 @@ class simulatedJoystick {
      *
      * @param j The real joystick this is based on.
      */
-    public simulatedJoystick(Joystick j, int id) {
+    public simulatedJoystick(Joystick j) {
         buttons = new boolean[j.getButtonCount()];
         axes = new double[j.getAxisCount()];
         POVs = new int[j.getPOVCount()];
-        this.id = id;
+        this.id = j.getPort();
     }
 
     /**

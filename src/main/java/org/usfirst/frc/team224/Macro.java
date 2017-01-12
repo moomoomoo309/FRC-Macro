@@ -1,4 +1,4 @@
-package org.usfirst.frc.team224.robot;
+package org.usfirst.frc.team224;
 import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.ArrayList;
@@ -43,10 +43,10 @@ public class Macro {
         this.ids = Arrays.stream(sticks).mapToInt(Joystick::getPort).toArray();
         previousStateSticks = new HashMap<>();
         initialStateSticks = new HashMap<>();
-        for (int i = 0; i < this.sticks.length; i++) {
-            previousStateSticks.put(ids[i], new simulatedJoystick(this.sticks[i], ids[i]).update(this.sticks[i]));
+        for (Joystick stick : this.sticks) {
+            previousStateSticks.put(stick.getPort(), new simulatedJoystick(stick).update(stick));
             // initialStateSticks cannot have pointers to previousStateSticks in it. Each simulatedJoystick must be new.
-            initialStateSticks.put(ids[i], new simulatedJoystick(this.sticks[i], ids[i]).update(this.sticks[i]));
+            initialStateSticks.put(stick.getPort(), new simulatedJoystick(stick).update(stick));
         }
         macroFormatVersion = currentMacroFormatVersion;
     }
@@ -72,8 +72,8 @@ public class Macro {
         this.sticks = sticks;
         this.ids = Arrays.stream(sticks).mapToInt(Joystick::getPort).toArray();
         previousStateSticks = new HashMap<>();
-        for (int i = 0; i < this.sticks.length; i++)
-            previousStateSticks.put(ids[i], new simulatedJoystick(this.sticks[i], ids[i]).update(this.sticks[i]));
+        for (Joystick stick : this.sticks)
+            previousStateSticks.put(stick.getPort(), new simulatedJoystick(stick).update(stick));
         events = new ArrayList<>();
         startTime = Long.parseLong(lines[0].substring(1));
         // Read the initial state of each stick

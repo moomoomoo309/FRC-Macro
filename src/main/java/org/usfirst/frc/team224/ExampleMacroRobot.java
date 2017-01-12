@@ -1,4 +1,4 @@
-package org.usfirst.frc.team224.robot;
+package org.usfirst.frc.team224;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * An example IterativeRobot class implementing Macro recording, Macro playback, storing and reading values from a config file,
- * Joystick event binding.
+ * An example IterativeRobot class implementing Macro recording, Macro playback, storing and reading values from a
+ * config file, and Joystick event binding.
  * <p>
  * Feel free to make your actual Robot class extend this one instead of IterativeRobot.
  *
@@ -29,7 +29,6 @@ public class ExampleMacroRobot extends IterativeRobot {
     //Defaults for values loaded from the config
     private static double minSpeed = .45; //The slowest the robot can move, (because under a certain threshold it won't move!)
     private static double maxSpeed = 1; //The fastest it can move. (In case you don't want the motors to run at full power)
-
     //Stuff whose IDs may need to be changed
     private static final int driveStickId = 0;
     private static final int auxStickId = 1;
@@ -50,8 +49,8 @@ public class ExampleMacroRobot extends IterativeRobot {
     public void robotInit() { //Joysticks work oddly at competition when you initialize them outside of robotInit...
         realDriveStick = new Joystick(driveStickId);
         realAuxStick = new Joystick(auxStickId);
-        driveStick = new simulatedJoystick(realDriveStick, driveStickId);
-        auxStick = new simulatedJoystick(realAuxStick, auxStickId);
+        driveStick = new simulatedJoystick(realDriveStick);
+        auxStick = new simulatedJoystick(realAuxStick);
         macroHelper = new MacroHelper(macroDir, autoChooser, realDriveStick, realAuxStick);
         macroHelper.addExistingMacrosToSendableChooser(); //The method name should explain itself, if not the JavaDoc.
         addJoystickMethods();
@@ -228,7 +227,7 @@ public class ExampleMacroRobot extends IterativeRobot {
     /**
      * Stops all of the motors, the shooter, or anything else that should be shut off at the end of autonomous.
      * <br><br>
-     * Yes, a {@link com.ctre.CANTalon CANTalon} or {@link edu.wpi.first.wpilibj.RobotDrive RobotDrive}, for
+     * Yes, a CANTalon or {@link edu.wpi.first.wpilibj.RobotDrive RobotDrive}, for
      * example, implements {@link MotorSafety} or {@link SpeedController}, so it'll work fine.
      *
      * @param preFunction Any function you want run before stopping all of the motors. (Like if you need to move back an arm or something).<br>

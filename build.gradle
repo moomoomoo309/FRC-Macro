@@ -10,13 +10,8 @@ buildscript {
             name = "GradleRIO"
             url = "http://dev.imjac.in/maven"
         }
-        maven {
-            name = "FRC"
-            url = "http://first.wpi.edu/FRC/roborio/maven/release"
-        }
     }
     dependencies {
-        classpath group: 'edu.wpi.first.wpilibj', name: 'athena', version: '2017.1.1'
         classpath group: 'jaci.openrio.gradle', name: 'GradleRIO', version: '+'
         //Change this line if you wish to Update GradleRIO
     }
@@ -27,9 +22,10 @@ apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'GradleRIO'                                 //Apply the GradleRIO plugin
 
-gradlerio.robotClass = "org.usfirst.frc.team224.Robot"   //The class for the main Robot Class. Used in manifest
+gradlerio.robotClass = "org.usfirst.frc.team224.ExampleMacroRobot"   //The class for the main Robot Class. Used in manifest
 gradlerio.team = "224"                                   //Your FRC team number (e.g. 5333 for team 'Can't C#', or 47 for Chief Delphi)
-//gradlerio.rioIP = "10.53.33.20"                         //Uncomment to specify the IP address of the RIO
+gradlerio.rioIP = "10.2.24.83"                         //Uncomment to specify the IP address of the RIO
+//gradlerio.wpilib_version="notAValidVersion"
 
 dependencies {
     compile fileTree(dir: '/home/nicholasdelello/GradleRIO/GradleRIO/gradle/libs', include: '*.jar')
@@ -54,6 +50,6 @@ artifacts {
     archives genJavadoc
 }
 
-fileTree(dir: "/home/nicholasdelello/GradleRIO/GradleRIO/gradle/libs", include: '**/*.so').each { File f ->
-    gradlerio.deployers += [ to: "/usr/local/frc/lib/${f.name}.jar", from: f.file ]
-}
+//fileTree(dir: "/home/nicholasdelello/GradleRIO/GradleRIO/gradle/libs", include: '**/*.so').each { File f ->
+//    gradlerio.deployers += [ to: "/usr/local/frc/lib/${f.name}.jar", from: f.file ]
+//}
