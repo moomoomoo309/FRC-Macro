@@ -23,7 +23,7 @@ class simulatedJoystick {
      * @param id The id of the real joystick this is based on.
      */
     public simulatedJoystick(int id) {
-        this(new Joystick(id));
+        this(new Joystick(id), id);
     }
 
     /**
@@ -31,11 +31,11 @@ class simulatedJoystick {
      *
      * @param j The real joystick this is based on.
      */
-    public simulatedJoystick(Joystick j) {
+    public simulatedJoystick(Joystick j, int id) {
         buttons = new boolean[j.getButtonCount()];
         axes = new double[j.getAxisCount()];
         POVs = new int[j.getPOVCount()];
-        this.id = j.getPort();
+        this.id = id;
     }
 
     /**

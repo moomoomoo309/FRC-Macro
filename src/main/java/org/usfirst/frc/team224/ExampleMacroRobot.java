@@ -40,7 +40,7 @@ public class ExampleMacroRobot extends IterativeRobot {
     private static Joystick realAuxStick;
     private static simulatedJoystick driveStick;
     private static simulatedJoystick auxStick;
-    private static final SendableChooser<String> autoChooser = new SendableChooser<>();
+    private static final SendableChooser autoChooser = new SendableChooser();
     private static Macro currentMacro; //Used to keep track of the current macro
     private static MacroHelper macroHelper;
     private static final HashMap<JoystickEvent, Runnable> methods = new HashMap<>();
@@ -49,9 +49,9 @@ public class ExampleMacroRobot extends IterativeRobot {
     public void robotInit() { //Joysticks work oddly at competition when you initialize them outside of robotInit...
         realDriveStick = new Joystick(driveStickId);
         realAuxStick = new Joystick(auxStickId);
-        driveStick = new simulatedJoystick(realDriveStick);
-        auxStick = new simulatedJoystick(realAuxStick);
-        macroHelper = new MacroHelper(macroDir, autoChooser, realDriveStick, realAuxStick);
+        driveStick = new simulatedJoystick(realDriveStick, driveStickId);
+        auxStick = new simulatedJoystick(realAuxStick, auxStickId);
+        macroHelper = new MacroHelper(macroDir, autoChooser, new int[] {driveStickId,auxStickId}, realDriveStick, realAuxStick);
         macroHelper.addExistingMacrosToSendableChooser(); //The method name should explain itself, if not the JavaDoc.
         addJoystickMethods();
         loadVarsFromConfig();

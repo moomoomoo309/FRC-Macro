@@ -2,7 +2,6 @@ package org.usfirst.frc.team224;
 import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -37,16 +36,16 @@ public class Macro {
      *
      * @param sticks An array containing all joysticks being used in the recording.
      */
-    public Macro(Joystick[] sticks) {
+    public Macro(Joystick[] sticks, int[] ids) {
         events = new ArrayList<>();
         this.sticks = sticks;
-        this.ids = Arrays.stream(sticks).mapToInt(Joystick::getPort).toArray();
+        this.ids = ids;
         previousStateSticks = new HashMap<>();
         initialStateSticks = new HashMap<>();
-        for (Joystick stick : this.sticks) {
-            previousStateSticks.put(stick.getPort(), new simulatedJoystick(stick).update(stick));
+        for (int i=0; i<sticks.length; i++) {
+            previousStateSticks.put(ids[i], new simulatedJoystick(sticks[i], ids[i]).update(sticks[i]));
             // initialStateSticks cannot have pointers to previousStateSticks in it. Each simulatedJoystick must be new.
-            initialStateSticks.put(stick.getPort(), new simulatedJoystick(stick).update(stick));
+            initialStateSticks.put(ids[i], new simulatedJoystick(sticks[i], ids[i]).update(sticks[i]));
         }
         macroFormatVersion = currentMacroFormatVersion;
     }
@@ -58,8 +57,8 @@ public class Macro {
      * @param sticks      The joysticks used in the recording
      */
 
-    public Macro(String loadedMacro, Joystick[] sticks) {
-        this(loadedMacro.split("\n"), sticks);
+    public Macro(String loadedMacro, Joystick[] sticks, int[] ids) {
+        this(loadedMacro.split("\n"), sticks, ids);
     }
 
     /**
@@ -68,12 +67,12 @@ public class Macro {
      * @param lines  The output from Macro.toString()
      * @param sticks The joysticks used in the recording
      */
-    public Macro(String[] lines, Joystick[] sticks) {
+    public Macro(String[] lines, Joystick[] sticks, int[] ids) {
         this.sticks = sticks;
-        this.ids = Arrays.stream(sticks).mapToInt(Joystick::getPort).toArray();
+        this.ids = ids;
         previousStateSticks = new HashMap<>();
-        for (Joystick stick : this.sticks)
-            previousStateSticks.put(stick.getPort(), new simulatedJoystick(stick).update(stick));
+        for (int i=0; i<sticks.length; i++)
+            previousStateSticks.put(ids[i], new simulatedJoystick(sticks[i], ids[i]).update(sticks[i]));
         events = new ArrayList<>();
         startTime = Long.parseLong(lines[0].substring(1));
         // Read the initial state of each stick

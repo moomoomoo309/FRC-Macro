@@ -24,11 +24,12 @@ public class MacroHelper {
     /**
      * The {@link SendableChooser} being used to select your autonomous mode.
      */
-    private final SendableChooser<String> autoChooser;
+    private final SendableChooser autoChooser;
     /**
      * An array containing all of your real joysticks.
      */
     private final Joystick[] realSticks;
+    private final int[] ids;
     private Long lastPress;
     private static boolean debug = false;
 
@@ -38,15 +39,17 @@ public class MacroHelper {
      * @param macroDir    The directory to store all macros in.
      * @param autoChooser The {@link SendableChooser} being used
      * @param realSticks  The actual joysticks being used.
+     * @param ids         The IDs of the joysticks.
      */
-    public MacroHelper(String macroDir, SendableChooser<String> autoChooser, Joystick... realSticks) {
+    public MacroHelper(String macroDir, SendableChooser autoChooser, int[] ids, Joystick... realSticks) {
         this.macroDir = macroDir;
         this.autoChooser = autoChooser;
         this.realSticks = realSticks;
+        this.ids = ids;
     }
 
-    public MacroHelper(String macroDir, SendableChooser<String> autoChooser, boolean debug, Joystick... realSticks) {
-        this(macroDir, autoChooser, realSticks);
+    public MacroHelper(String macroDir, SendableChooser autoChooser, int[] ids, boolean debug, Joystick... realSticks) {
+        this(macroDir, autoChooser, ids, realSticks);
         MacroHelper.debug = debug;
     }
 
@@ -68,11 +71,11 @@ public class MacroHelper {
      * @return True = Run teleop; False = Stop the robot; null = A macro wasn't chosen in the SendableChooser.
      */
     public Boolean autonMacro(Macro currentMacro) throws IOException {
-        String chosenAuton = autoChooser.getSelected();
+        String chosenAuton = (String) autoChooser.getSelected();
         if (chosenAuton.startsWith("macro")) {
             if (currentMacro == null) {
                 System.out.println("currentMacro is null, generating...");
-                currentMacro = new Macro(readFile(macroDir + chosenAuton.substring(5)), realSticks);
+                currentMacro = new Macro(readFile(macroDir + chosenAuton.substring(5)), realSticks, ids);
                 currentMacro.startPlaying();
                 System.out.println("Macro length: " + currentMacro.length() / 1000D + "seconds");
             } else
@@ -138,7 +141,7 @@ public class MacroHelper {
      */
     public void startOrStopMacro(Macro currentMacro) throws IOException {
         if (currentMacro == null) {
-            currentMacro = new Macro(realSticks);
+            currentMacro = new Macro(realSticks, ids);
             System.out.println("Recording...");
             currentMacro.startRecording();
         } else {
@@ -156,7 +159,7 @@ public class MacroHelper {
      * @return The selected autonomous mode
      */
     public String getSelectedAuton() {
-        return autoChooser.getSelected();
+        return (String) autoChooser.getSelected();
     }
 
     /**

@@ -27,9 +27,9 @@ gradlerio.team = "224"                                   //Your FRC team number 
 gradlerio.rioIP = "10.2.24.83"                         //Uncomment to specify the IP address of the RIO
 //gradlerio.wpilib_version="notAValidVersion"
 
-dependencies {
-    compile fileTree(dir: '/home/nicholasdelello/GradleRIO/GradleRIO/gradle/libs', include: '*.jar')
-}
+//dependencies {
+//    compile fileTree(dir: '/home/nicholasdelello/GradleRIO/GradleRIO/gradle/libs', include: '*.jar')
+//}
 
 def robotManifest = {
     attributes 'Main-Class': 'edu.wpi.first.wpilibj.RobotBase'
