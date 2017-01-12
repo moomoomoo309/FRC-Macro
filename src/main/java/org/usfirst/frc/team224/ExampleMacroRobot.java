@@ -1,8 +1,10 @@
 package org.usfirst.frc.team224;
 
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.MotorSafety;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -32,7 +34,11 @@ public class ExampleMacroRobot extends IterativeRobot {
     //Stuff whose IDs may need to be changed
     private static final int driveStickId = 0;
     private static final int auxStickId = 1;
-    private static final int recordButtonID = 5;
+    private static final int recordButtonId = 5;
+    private static final int frontLeftMotorId = 0; //ID of the front left motor
+    private static final int backLeftMotorId = 1; //ID of the back left motor
+    private static final int frontRightMotorId = 2; //ID of the front right motor
+    private static final int backRightMotorId = 3; //ID of the back right motor
     private static final boolean debug = false; //Makes all errors print out their stack traces. Shouldn't be true unless you're debugging.
 
     //Initializing variables, no need to change these.
@@ -45,6 +51,10 @@ public class ExampleMacroRobot extends IterativeRobot {
     private static MacroHelper macroHelper;
     private static final HashMap<JoystickEvent, Runnable> methods = new HashMap<>();
     private static final ArrayList<Runnable> scheduledEvents = new ArrayList<>();
+    private static RobotDrive drive;
+    private static double throttle;
+    private static SpeedController[] motors;
+    private static boolean stoppedMacro = false;
 
     public void robotInit() { //Joysticks work oddly at competition when you initialize them outside of robotInit...
         realDriveStick = new Joystick(driveStickId);
@@ -53,6 +63,11 @@ public class ExampleMacroRobot extends IterativeRobot {
         auxStick = new simulatedJoystick(realAuxStick);
         macroHelper = new MacroHelper(macroDir, autoChooser, realDriveStick, realAuxStick);
         macroHelper.addExistingMacrosToSendableChooser(); //The method name should explain itself, if not the JavaDoc.
+        //Change these to your actual motor controllers.
+        motors = new SpeedController[]{new CANTalon(frontLeftMotorId), new CANTalon(backLeftMotorId),
+                new CANTalon(frontRightMotorId), new CANTalon(backRightMotorId)};
+
+        drive = new RobotDrive(motors[0], motors[1], motors[2], motors[3]);
         addJoystickMethods();
         loadVarsFromConfig();
     }
@@ -61,7 +76,7 @@ public class ExampleMacroRobot extends IterativeRobot {
      * Registers all of the methods to be run on joystick events.
      */
     public void addJoystickMethods() {
-        addJoystickMethod(JoystickEvent.eventType.PRESS, recordButtonID, driveStickId, () -> { //When the record button on the drive stick is pressed...
+        addJoystickMethod(JoystickEvent.eventType.PRESS, recordButtonId, driveStickId, () -> { //When the record button on the drive stick is pressed...
             try {
                 macroHelper.startOrStopMacro(currentMacro); //Start or stop the macro!
             } catch (IOException e) {
@@ -128,6 +143,10 @@ public class ExampleMacroRobot extends IterativeRobot {
         return true;
     }
 
+    public void autonomousInit() {
+        stoppedMacro = false; //In case you run autonomous more than once, reset stoppedMacro.
+    }
+
     public void autonomousPeriodic() {
         Boolean runMacro = null;
         try {
@@ -140,8 +159,11 @@ public class ExampleMacroRobot extends IterativeRobot {
         if (runMacro != null)
             if (runMacro)
                 teleopPeriodic();
-            else
-                stopRobot(); //Put your motors in here!
+            else if (!stoppedMacro) { //The macro is over.
+                //Add any additional motors you want, or a function to run before stopping these motors.
+                stopRobot(motors[0], motors[1], motors[2], motors[3]);
+                stoppedMacro = true; //Make sure it only runs once.
+            }
         else
             switch (macroHelper.getSelectedAuton()) { //Non-macro autons
                 case "example":
@@ -182,7 +204,8 @@ public class ExampleMacroRobot extends IterativeRobot {
 
     /**
      * Schedules <code>function</code> to run in <code>seconds</code> seconds
-     * @param seconds The number of seconds until <code>function</code> runs
+     *
+     * @param seconds  The number of seconds until <code>function</code> runs
      * @param function The function to run when <code>seconds</code> seconds has passed.
      */
     public void scheduleEvent(double seconds, Runnable function) {
@@ -204,7 +227,9 @@ public class ExampleMacroRobot extends IterativeRobot {
     public void teleopPeriodic() { //It drives, has joystick events, and has the throttle.
         driveStick.updateWithEvents(realDriveStick, driveStickId).forEach(this::runJoystickMethod);
         auxStick.updateWithEvents(realAuxStick, auxStickId).forEach(this::runJoystickMethod);
-        scheduledEvents.forEach(Runnable::run); //Check all scheduled events, then run them if ready (they remove themselves from the HashMap)
+        scheduledEvents.forEach(Runnable::run); //Check all scheduled events, then run them if ready (they remove themselves from the ArrayList automatically)
+        throttle = (-driveStick.getThrottle() + 1) / 2 * (maxSpeed - minSpeed) + minSpeed;
+        drive.arcadeDrive(driveStick.getY() * throttle, -driveStick.getTwist() * throttle);
     }
 
     /**
